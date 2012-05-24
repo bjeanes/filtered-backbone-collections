@@ -1,16 +1,10 @@
-# TODO: Use bjeanes' SubsettableCollection which does 90% of this already
-Backbone.Collection.prototype.subset = (fn) ->
-  superset = this
-  Superset = superset.constructor
+select = (items, fn) ->
+  items = if _.isArray(items) then items else [items]
+  _(items).select(fn)
 
-  filter = {fn: fn || -> true }
+reject = (items, fn) -> select(items, -> !fn.apply(@, arguments))
 
-  select = (items, fn) ->
-    items = if _.isArray(items) then items else [items]
-    _(items).select(fn)
-
-  reject = (items, fn) -> select(items, -> !fn.apply(@, arguments))
-
+subsetFor = (superset, filter) ->
   reset = (collection) -> @reset(filter.fn(collection.models))
 
   change = (model) ->
@@ -24,13 +18,13 @@ Backbone.Collection.prototype.subset = (fn) ->
       @remove(model)
       return
 
-  class Subset extends Superset
-    initialize: =>
+  class Subset extends superset.constructor
+    constructor: ->
       @__defineSetter__? "subsetFilter", @setSubsetFilter
 
       @bind 'filter', @applySubsetFilter
-      superset.bind 'add',    @add
-      superset.bind 'remove', @remove
+      superset.bind 'add',    @add, @
+      superset.bind 'remove', @remove, @
       superset.bind 'reset',  reset, @
       superset.bind 'change', change, @
 
@@ -47,13 +41,21 @@ Backbone.Collection.prototype.subset = (fn) ->
         else
           @remove(model)
 
-    add: (models, options) =>
+    add: (models, options) ->
       models = select models, (model) -> superset.contains(model) && filter.fn(model)
       superset.add.call(@, models, options)
 
-    remove: (models, options) =>
+    remove: (models, options) ->
       models = reject models, (model) -> superset.contains(model) && filter.fn(model)
       superset.remove.call(@, models, options)
 
-  new Subset(superset.filter(filter.fn))
+Backbone.Collection.prototype.subset = (fn) ->
+  filter = { fn: fn || -> true }
+  Subset = subsetFor(@, filter)
+  new Subset(@filter(filter.fn), @options)
+
+# Replace Backbone.Collection with a version that stores the passed
+# in options so that we can restore them in the subset classes
+class Backbone.Collection extends Backbone.Collection
+  constructor: (models, @options) -> super(models, @options)
 
