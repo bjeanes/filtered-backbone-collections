@@ -6,14 +6,17 @@
 describe 'Backbone.Collection#subset', ->
   beforeEach ->
     @Model            = Backbone.Model
-    @ParentCollection = Backbone.Collection.extend({model: @Model})
+    @ParentCollection = Backbone.Collection.extend
+      model: @Model
+      initialize: (models, @options) ->
+
     @parentCollection = new @ParentCollection [
       { id: 1, color: "red",    status: 'started'     },
       { id: 2, color: "blue",   status: 'in-progress' },
       { id: 3, color: "blue",   status: 'in-progress' },
       { id: 4, color: "yellow", status: 'in-progress' },
       { id: 5, color: "green",  status: 'finished'    },
-    ]
+    ], @options = {some: "options"}
 
     @addMatchers
       toContainModel: (expected) -> @actual.contains(expected)
@@ -72,6 +75,9 @@ describe 'Backbone.Collection#subset', ->
       @childCollection = @parentCollection.subset (m) ->
         m.get('status') == 'in-progress'
 
+    it "calls the initializer with the same options passed to the parent's constructor", ->
+      expect(@childCollection.options).toBe(@options)
+
     it "has a subset of the parent's models", ->
       expect(@childCollection.length).toBeLessThan(@parentCollection.length)
 
@@ -81,6 +87,11 @@ describe 'Backbone.Collection#subset', ->
     it "does not have the non-matching elements", ->
       expect(@childCollection).not.toContainModel(@parentCollection.get(1))
       expect(@childCollection).not.toContainModel(@parentCollection.get(5))
+
+    it "maintains its own index", ->
+      expect(@childCollection.at(0)).toBe(@parentCollection.at(1))
+      expect(@childCollection.at(1)).toBe(@parentCollection.at(2))
+      expect(@childCollection.at(2)).toBe(@parentCollection.at(3))
 
     context 'when adding to the parent collection', ->
       context "and the model matches the filter", ->
@@ -295,14 +306,15 @@ describe 'Backbone.Collection#subset', ->
 
     context "when removing a model directly from child collection", -> # FIXME: undefined behavior?
 
-    context 'when further filtered', ->
+    describe 'a second level filtered collection', ->
       beforeEach ->
         @grandchildCollection = @childCollection.subset (m) -> m.get("color") == "blue"
 
-      # TODO: repeat all the above tests here? Jasmine "shared examples"?
+      it "has a subset of its parent's models", ->
+        expect(@grandchildCollection.length).toBeLessThan(@childCollection.length)
 
 
   # TODO: is this possible?
   it "has a class name that identifies what it is filtering"
 
-  # TODO: changing subset filter reapplies filter and should trigger appropriate events
+  # TODO: changing subset filter function reapplies filter and should trigger appropriate events

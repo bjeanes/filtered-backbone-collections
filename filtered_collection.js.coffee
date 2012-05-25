@@ -1,24 +1,22 @@
-select = (items, fn) ->
-  items = if _.isArray(items) then items else [items]
-  _(items).select(fn)
-
-reject = (items, fn) -> select(items, -> !fn.apply(@, arguments))
+defaultFilter = -> true
+toArray       = (items) -> _(if _.isArray(items) then items else [items])
 
 subsetFor = (superset, filter) ->
-  reset = (collection) -> @reset(filter.fn(collection.models))
+  match       = (model)  -> superset.contains(model) && filter(model)
+  matching    = (models) -> toArray(models).select(match)
+  nonMatching = (models) -> toArray(models).reject(match)
 
+  reset = (collection) -> @reset(filter(collection.models))
+
+  # TODO: redefine in terms of matching() and nonMatching() ?
+  # TODO: also assert that it is still in the parent collection
   change = (model) ->
-    matches = filter.fn(model)
-
-    if matches && !@contains(model)
+    if filter(model)
       @add(model)
-      return
-
-    if !matches && @contains(model)
+    else
       @remove(model)
-      return
 
-  class Subset extends superset.constructor
+  class extends superset.constructor
     constructor: ->
       @__defineSetter__? "subsetFilter", @setSubsetFilter
 
@@ -31,31 +29,24 @@ subsetFor = (superset, filter) ->
       super
 
     setSubsetFilter: (fn) =>
-      filter.fn = fn
+      filter = fn
       @trigger('filter')
 
+    # TODO: test that this takes into consideration parent collection membership (filter() vs matching())
     applySubsetFilter: =>
-      superset.each (model) =>
-        if filter.fn(model)
-          @add(model)
-        else
-          @remove(model)
+      changes = superset.groupBy(matching)
+      @add    changes[true]
+      @remove changes[false]
 
-    add: (models, options) ->
-      models = select models, (model) -> superset.contains(model) && filter.fn(model)
-      super(models, options)
+    add:    (models, options) -> super(matching    models, options)
+    remove: (models, options) -> super(nonMatching models, options)
 
-    remove: (models, options) ->
-      models = reject models, (model) -> superset.contains(model) && filter.fn(model)
-      super(models, options)
-
-Backbone.Collection.prototype.subset = (fn) ->
-  filter = { fn: fn || -> true }
+Backbone.Collection.prototype.subset = (filter = defaultFilter) ->
   Subset = subsetFor(@, filter)
-  new Subset(@filter(filter.fn), @options)
+  new Subset(@filter(filter), @options)
 
 # Replace Backbone.Collection with a version that stores the passed
 # in options so that we can restore them in the subset classes
 class Backbone.Collection extends Backbone.Collection
-  constructor: (models, @options) -> super(models, @options)
+  constructor: (_, @options) -> super
 
