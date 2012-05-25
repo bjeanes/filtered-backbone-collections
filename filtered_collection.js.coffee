@@ -43,11 +43,11 @@ subsetFor = (superset, filter) ->
 
     add: (models, options) ->
       models = select models, (model) -> superset.contains(model) && filter.fn(model)
-      superset.add.call(@, models, options)
+      super(models, options)
 
     remove: (models, options) ->
       models = reject models, (model) -> superset.contains(model) && filter.fn(model)
-      superset.remove.call(@, models, options)
+      super(models, options)
 
 Backbone.Collection.prototype.subset = (fn) ->
   filter = { fn: fn || -> true }
