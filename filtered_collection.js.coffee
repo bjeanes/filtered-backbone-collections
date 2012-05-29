@@ -34,6 +34,8 @@ subsetFor = (superset, filter) ->
 
     # TODO: test that this takes into consideration parent collection membership (filter() vs matching())
     applySubsetFilter: =>
+      # TODO: performance gain can be made by running matching as a selection instead of once per item.
+      #       easy way to do a set difference based on a collection selection?
       changes = superset.groupBy(matching)
       @add    changes[true]
       @remove changes[false]
