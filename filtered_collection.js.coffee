@@ -41,7 +41,7 @@ subsetFor = (superset, filter) ->
       @remove changes[false]
 
     add:    (models, options) -> super(matching    models, options)
-    remove: (models, options) -> super(nonMatching models, options)
+    remove: (models, options) -> Backbone.Collection.prototype.remove.call(@, nonMatching models, options)
 
 Backbone.Collection.prototype.subset = (filter = defaultFilter) ->
   Subset = subsetFor(@, filter)
