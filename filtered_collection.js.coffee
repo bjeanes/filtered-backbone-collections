@@ -16,7 +16,7 @@ subsetFor = (superset, filter) ->
     else
       @remove(model)
 
-  class extends superset.constructor
+  class Subset extends superset.constructor
     constructor: ->
       @__defineSetter__? "subsetFilter", @setSubsetFilter
 
