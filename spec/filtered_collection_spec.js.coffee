@@ -315,6 +315,82 @@ describe 'Backbone.Collection#subset', ->
 
 
   # TODO: is this possible?
-  it "has a class name that identifies what it is filtering"
+  it "has a class name that identifies what it is filtering", ->
 
-  # TODO: changing subset filter function reapplies filter and should trigger appropriate events
+  context "when a filter event triggered on an existing subset, and a model in the subset does not match the current filter", ->
+    beforeEach ->
+      filterStatus = 'in-progress'
+
+      filter = (m) ->
+        m.get('status') == filterStatus
+
+      @childCollection = @parentCollection.subset(filter)
+
+      @inProgressModel = @parentCollection.get(2)
+      expect(@childCollection).toContainModel(@inProgressModel)
+
+      @modelHandler = jasmine.createSpy()
+      @inProgressModel.bind('remove', @modelHandler)
+
+      @collectionHandler = jasmine.createSpy()
+      @childCollection.bind('remove', @collectionHandler)
+      @parentCollection.bind('remove', @collectionHandler)
+
+      filterStatus = 'finished'
+      @childCollection.trigger("filter")
+
+      it "should not contain the non-matching model", ->
+        expect(@childCollection).not.toContainModel(@inProgressModel)
+
+      it "triggers a collection remove event on the subset collection", ->
+        expect(@collectionHandler).toHaveBeenCalledWith(@inProgressModel, @childCollection, jasmine.any(Object))
+
+      it "triggers a model remove event on the model with the subset collection", ->
+        expect(@modelHandler).toHaveBeenCalledWith(@inProgressModel, @childCollection, jasmine.any(Object))
+
+      it "does not trigger a collection remove event on the parent collection", ->
+        expect(@collectionHandler).not.toHaveBeenCalledWith(@inProgressModel, @parentCollection, jasmine.any(Object))
+
+      it "does not trigger a model remove event on the model with the parent collection", ->
+        expect(@modelHandler).not.toHaveBeenCalledWith(@inProgressModel, @parentCollection, jasmine.any(Object))
+
+  context "when a filter event triggered on a subset of a subset, and a model in the (grandchild) subset does not match the current filter, but still matches the parent's filter", ->
+    beforeEach ->
+      filterColor = "yellow"
+
+      grandChildFilter = (m) ->
+        m.get('color') == filterColor
+
+      @childCollection = @parentCollection.subset((m) -> m.get('status') == "in-progress")
+      @grandchildCollection = @childCollection.subset(grandChildFilter)
+
+      @yellowModel = @parentCollection.get(4)
+      expect(@grandchildCollection).toContainModel(@yellowModel)
+
+      @modelHandler = jasmine.createSpy()
+      @yellowModel.bind('remove', @modelHandler)
+
+      @collectionHandler = jasmine.createSpy()
+      @grandchildCollection.bind('remove', @collectionHandler)
+      @childCollection.bind('remove', @collectionHandler)
+      @parentCollection.bind('remove', @collectionHandler)
+
+      filterColor = 'blue'
+      @grandchildCollection.trigger("filter")
+
+    it "should no longer contain the non-matching model", ->
+      expect(@grandchildCollection).not.toContainModel(@yellowModel)
+
+    it "triggers a collection remove event on the grandchild collection", ->
+      expect(@collectionHandler).toHaveBeenCalledWith(@yellowModel, @grandchildCollection, jasmine.any(Object))
+
+    it "triggers a model remove event on the model with the grandchild collection", ->
+      expect(@modelHandler).toHaveBeenCalledWith(@yellowModel, @grandchildCollection, jasmine.any(Object))
+
+    it "does not trigger a collection remove event on the parent or the child collection", ->
+      expect(@collectionHandler).not.toHaveBeenCalledWith(@yellowModel, @parentCollection, jasmine.any(Object))
+      expect(@collectionHandler).not.toHaveBeenCalledWith(@yellowModel, @childCollection, jasmine.any(Object))
+
+    it "does not trigger a model remove event on the model with the parent or the child collection", ->
+      expect(@modelHandler).not.toHaveBeenCalledWith(@yellowModel, @parentCollection, jasmine.any(Object))
+      expect(@modelHandler).not.toHaveBeenCalledWith(@yellowModel, @childCollection, jasmine.any(Object))
