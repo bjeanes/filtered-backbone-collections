@@ -89,16 +89,15 @@ $(function() {
 
   window.listSquares = new ListView({
     el: $("#demo ul.squares"),
-    collection: window.items
-  });
-
-  window.listRed = new ListView({
-    el: $("#demo ul.red"),
-    collection: window.items
+    collection: window.items.subset(function(item) {
+      return item.get("shape") == "square";
+    })
   });
 
   window.listRedSquares = new ListView({
     el: $("#demo ul.red-squares"),
-    collection: window.items
+    collection: window.listSquares.collection.subset(function(item) {
+      return item.get("color") == "red";
+    })
   });
 });
