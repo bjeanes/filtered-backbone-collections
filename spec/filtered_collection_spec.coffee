@@ -1,8 +1,3 @@
-# = require jquery
-# = require underscore
-# = require backbone
-# = require backbone/ext/filtered_collection
-
 describe 'Backbone.Collection#subset', ->
   beforeEach ->
     @Model            = Backbone.Model
