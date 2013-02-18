@@ -1,12 +1,5 @@
 $(function() {
-  var Item = Backbone.Model.extend();
-
-  var Items = Backbone.Collection.extend({
-    model: Item
-  });
-
-  var NewItemForm = Backbone.View.extend();
-
+  var Items = Backbone.Collection.extend();
   var ItemView = Backbone.View.extend({
     tagName: "li",
 
