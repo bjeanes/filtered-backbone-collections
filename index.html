@@ -19,6 +19,8 @@
       #demo .shape { font-size: 230%; width: 1em; display: inline-block; text-align: center; }
       #demo .delete { text-decoration: underline; }
       #demo ul li { list-style: none; }
+      p { clear: both; }
+      pre { float: right; font-size: 75%; width: 65%; line-height: 1.5em; }
     </style>
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -43,15 +45,48 @@
       <section id="demo">
         <h3>Demo</h3>
 
-        <h4>All</h4>
-        <ul class="all">
-        </ul>
-        <h4>Squares</h4>
-        <ul class="squares">
-        </ul>
-        <h4>Red Squares</h4>
-        <ul class="red-squares">
-        </ul>
+        <p>Given a list of items:</p>
+
+        <pre>var items = new Items([
+    {shape: "square", color: "red"},
+    {shape: "circle", color: "blue"},
+    {shape: "square", color: "green"},
+    {shape: "triangle", color: "red"},
+    {shape: "rectangle", color: "purple"},
+    {shape: "square", color: "red"}
+]);
+
+new ListView({el: $("#demo ul.all"), collection: items});</pre>
+
+        <ul class="all"> </ul>
+
+        <p>We can filter them by some arbitrary criteria (in this
+        case, "squares"):</p>
+
+        <pre>var squares = items.subset(function(item) {
+    return item.get("shape") == "square";
+});
+
+new ListView({
+    el: $("#demo ul.squares"),
+    collection: squares
+});</pre>
+
+        <ul class="squares"> </ul>
+
+        <p>Then, for no good reason at all, we can filter that
+        sub-collection even further (say, by "red"):</p>
+
+        <pre>var redSquares = squares.subset(function(item) {
+    return item.get("color") == "red";
+});
+
+new ListView({
+    el: $("#demo ul.red-squares"),
+    collection: redSquares
+});</pre>
+
+        <ul class="red-squares"> </ul>
 
 <!--         <p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p> -->
 
