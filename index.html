@@ -65,45 +65,45 @@
 
         <p>Given a list of items:</p>
 
-        <pre>var items = new Items([
-    {shape: "square", color: "red"},
-    {shape: "circle", color: "blue"},
-    {shape: "square", color: "green"},
-    {shape: "triangle", color: "red"},
-    {shape: "rectangle", color: "purple"},
-    {shape: "square", color: "red"}
-]);
+<pre class="highlight"><span class="kd">var</span> <span class="nx">items</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Items</span><span class="p">([</span>
+    <span class="p">{</span><span class="nx">shape</span><span class="o">:</span> <span class="s2">"square"</span><span class="p">,</span> <span class="nx">color</span><span class="o">:</span> <span class="s2">"red"</span><span class="p">},</span>
+    <span class="p">{</span><span class="nx">shape</span><span class="o">:</span> <span class="s2">"circle"</span><span class="p">,</span> <span class="nx">color</span><span class="o">:</span> <span class="s2">"blue"</span><span class="p">},</span>
+    <span class="p">{</span><span class="nx">shape</span><span class="o">:</span> <span class="s2">"square"</span><span class="p">,</span> <span class="nx">color</span><span class="o">:</span> <span class="s2">"green"</span><span class="p">},</span>
+    <span class="p">{</span><span class="nx">shape</span><span class="o">:</span> <span class="s2">"triangle"</span><span class="p">,</span> <span class="nx">color</span><span class="o">:</span> <span class="s2">"red"</span><span class="p">},</span>
+    <span class="p">{</span><span class="nx">shape</span><span class="o">:</span> <span class="s2">"rectangle"</span><span class="p">,</span> <span class="nx">color</span><span class="o">:</span> <span class="s2">"purple"</span><span class="p">},</span>
+    <span class="p">{</span><span class="nx">shape</span><span class="o">:</span> <span class="s2">"square"</span><span class="p">,</span> <span class="nx">color</span><span class="o">:</span> <span class="s2">"red"</span><span class="p">}</span>
+<span class="p">]);</span>
 
-new ListView({el: $("#demo ul.all"), collection: items});</pre>
-
+<span class="k">new</span> <span class="nx">ListView</span><span class="p">({</span><span class="nx">el</span><span class="o">:</span> <span class="nx">$</span><span class="p">(</span><span class="s2">"#demo ul.all"</span><span class="p">),</span> <span class="nx">collection</span><span class="o">:</span> <span class="nx">items</span><span class="p">});</span>
+</pre>
         <ul class="all"> </ul>
 
         <p>We can filter them by some arbitrary criteria (in this
         case, "squares"):</p>
 
-        <pre>var squares = items.subset(function(item) {
-    return item.get("shape") == "square";
-});
+<pre class="highlight"><span class="kd">var</span> <span class="nx">squares</span> <span class="o">=</span> <span class="nx">items</span><span class="p">.</span><span class="nx">subset</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">item</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">item</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">"shape"</span><span class="p">)</span> <span class="o">==</span> <span class="s2">"square"</span><span class="p">;</span>
+<span class="p">});</span>
 
-new ListView({
-    el: $("#demo ul.squares"),
-    collection: squares
-});</pre>
-
+<span class="k">new</span> <span class="nx">ListView</span><span class="p">({</span>
+    <span class="nx">el</span><span class="o">:</span> <span class="nx">$</span><span class="p">(</span><span class="s2">"#demo ul.squares"</span><span class="p">),</span>
+    <span class="nx">collection</span><span class="o">:</span> <span class="nx">squares</span>
+<span class="p">});</span>
+</pre>
         <ul class="squares"> </ul>
 
         <p>Then, for no good reason at all, we can filter that
         sub-collection even further (say, by "red"):</p>
 
-        <pre>var redSquares = squares.subset(function(item) {
-    return item.get("color") == "red";
-});
+<pre class="highlight"><span class="kd">var</span> <span class="nx">redSquares</span> <span class="o">=</span> <span class="nx">squares</span><span class="p">.</span><span class="nx">subset</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">item</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">item</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">"color"</span><span class="p">)</span> <span class="o">==</span> <span class="s2">"red"</span><span class="p">;</span>
+<span class="p">});</span>
 
-new ListView({
-    el: $("#demo ul.red-squares"),
-    collection: redSquares
-});</pre>
-
+<span class="k">new</span> <span class="nx">ListView</span><span class="p">({</span>
+    <span class="nx">el</span><span class="o">:</span> <span class="nx">$</span><span class="p">(</span><span class="s2">"#demo ul.red-squares"</span><span class="p">),</span>
+    <span class="nx">collection</span><span class="o">:</span> <span class="nx">redSquares</span>
+<span class="p">});</span>
+</pre>
         <ul class="red-squares"> </ul>
 
 <!--         <p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p> -->
